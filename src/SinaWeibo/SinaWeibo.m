@@ -399,6 +399,77 @@
     }
 }
 
+// Send a Weibo, to which you can attach an image.
+- (SinaWeiboRequest*)sendWeiBoWithText:(NSString *)text image:(UIImage *)image delegate:(id<SinaWeiboRequestDelegate>)requestDelegate {
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:2];
+    
+	[params setObject:(text ? text : @"") forKey:@"status"];
+	
+    if (image)
+    {
+		[params setObject:image forKey:@"pic"];
+        
+        return [self requestWithURL:@"statuses/upload.json" params:params httpMethod:@"POST" delegate:requestDelegate];
+    }
+    else
+    {
+        return [self requestWithURL:@"statuses/update.json" params:params httpMethod:@"POST" delegate:requestDelegate];
+    }
+}
+
+// Repost weibo
+- (SinaWeiboRequest*)repostWeibo:(NSNumber*)statusID withText:(NSString *)text delegate:(id<SinaWeiboRequestDelegate>)requestDelegate {
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:2];
+    
+	[params setObject:(text ? text : @"") forKey:@"status"];
+    [params setObject:[NSString stringWithFormat:@"%@", statusID] forKey:@"id"];
+    return [self requestWithURL:@"statuses/repost.json" params:params httpMethod:@"POST" delegate:requestDelegate];
+}
+
+// Get User Info
+- (SinaWeiboRequest*)getUserInfo:(NSString*)theUserID delegate:(id<SinaWeiboRequestDelegate>)requestDelegate {
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:2];
+
+	[params setObject:(theUserID) forKey:@"uid"];
+    return [self requestWithURL:@"users/show.json" params:params httpMethod:@"GET" delegate:requestDelegate];
+}
+
+// Get comments
+- (SinaWeiboRequest*)getComments:(NSNumber*)statusID startingAtPage:(int)page count:(int)count delegate:(id<SinaWeiboRequestDelegate>)requestDelegate {
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    [params setObject:[NSString stringWithFormat:@"%@", statusID] forKey:@"id"];
+    if (page > 0) {
+        [params setObject:[NSString stringWithFormat:@"%d", page] forKey:    @"page"];
+    }
+    if (count > 0) {
+        [params setObject:[NSString stringWithFormat:@"%d", count] forKey:    @"count"];
+    }
+    return [self requestWithURL:@"comments/show.json" params:params httpMethod:@"GET" delegate:requestDelegate];
+}
+
+// Create comment for a status. ReplyToCommentID can be nil.
+- (SinaWeiboRequest*)createComment:(NSNumber*)statusID replyTo:(NSNumber*)replyToCommentID withText:(NSString*)text delegate:(id<SinaWeiboRequestDelegate>)requestDelegate {
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    [params setObject:[NSString stringWithFormat:@"%@", statusID] forKey:@"id"];
+    [params setObject:text forKey:@"comment"];
+    if (replyToCommentID) {
+        [params setObject:[NSString stringWithFormat:@"%@", replyToCommentID] forKey:@"cid"];
+        return [self requestWithURL:@"comments/reply.json" params:params httpMethod:@"POST" delegate:requestDelegate];
+    } else {
+        return [self requestWithURL:@"comments/create.json" params:params httpMethod:@"POST" delegate:requestDelegate];
+    }
+}
+
+// Follow an user
+- (SinaWeiboRequest*)followUser:(NSNumber*)theUserID screenName:(NSString*)screenName delegate:(id<SinaWeiboRequestDelegate>)requestDelegate {
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:2];
+    
+	[params setObject:[NSString stringWithFormat:@"%@", theUserID] forKey:@"uid"];
+	[params setObject:(screenName?screenName:@"") forKey:@"screen_name"];
+    return [self requestWithURL:@"friendships/create.json" params:params httpMethod:@"POST" delegate:requestDelegate];
+}
+
+
 #pragma mark - SinaWeiboAuthorizeView Delegate
 
 - (void)authorizeView:(SinaWeiboAuthorizeView *)authView didRecieveAuthorizationCode:(NSString *)code

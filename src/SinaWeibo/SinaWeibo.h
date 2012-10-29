@@ -69,6 +69,24 @@
                          httpMethod:(NSString *)httpMethod
                            delegate:(id<SinaWeiboRequestDelegate>)delegate;
 
+// Send a Weibo, to which you can attach an image.
+- (SinaWeiboRequest*)sendWeiBoWithText:(NSString *)text image:(UIImage *)image delegate:(id<SinaWeiboRequestDelegate>)requestDelegate;
+
+// Repost weibo
+- (SinaWeiboRequest*)repostWeibo:(NSNumber*)statusID withText:(NSString *)text delegate:(id<SinaWeiboRequestDelegate>)requestDelegate;
+
+// Get User Info
+- (SinaWeiboRequest*)getUserInfo:(NSString*)theUserID delegate:(id<SinaWeiboRequestDelegate>)requestDelegate;
+
+// Get comments
+- (SinaWeiboRequest*)getComments:(NSNumber*)statusID startingAtPage:(int)page count:(int)count delegate:(id<SinaWeiboRequestDelegate>)requestDelegate;
+
+// Create comment for a status. ReplyToCommentID can be nil.
+- (SinaWeiboRequest*)createComment:(NSNumber*)statusID replyTo:(NSNumber*)replyToCommentID withText:(NSString*)text delegate:(id<SinaWeiboRequestDelegate>)requestDelegate;
+
+// Follow an user
+- (SinaWeiboRequest*)followUser:(NSNumber*)theUserID screenName:(NSString*)screenName delegate:(id<SinaWeiboRequestDelegate>)requestDelegate;
+
 @end
 
 
